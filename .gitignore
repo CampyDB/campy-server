@@ -1,0 +1,7 @@
+tmp/*
+.idea/
+*.db
+.venv/
+*.pyc
+log/*.log
+*.pid
