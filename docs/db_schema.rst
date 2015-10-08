@@ -1,5 +1,5 @@
 =====================
-SISTR Database Schema
+CampyDB Database Schema
 =====================
 
 

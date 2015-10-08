@@ -5,3 +5,4 @@ tmp/*
 *.pyc
 log/*.log
 *.pid
+docs/_build/

@@ -1,13 +1,6 @@
 """
 SQLAlchemy Database models
 
-- one public user (e.g. 'sistr') and many temporary users (random string user name; no password; no auth)
-- each user will have one or more genomes associated
-- each temporary user will be able to view public data and their own "private" data
-- each genome will have in silico typing data and assembly stat info associated with it
-- certain genomes will have more metadata info than others (e.g. some of the public genomes)
-- no metadata will be stored with "private" genomes other than in silico typing results and QUAST stats
-
 """
 
 from __future__ import absolute_import

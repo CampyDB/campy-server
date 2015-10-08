@@ -8,11 +8,11 @@ Contents:
 =========
 
 .. toctree::
-:maxdepth: 3
+    :maxdepth: 3
 
-       getting_started
-       db_schema
-       development
+    getting_started
+    db_schema
+    development
 
 
 Indices and tables
