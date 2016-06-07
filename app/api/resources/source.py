@@ -16,6 +16,7 @@ def source_data(df):
     df.index = list(df["Strain Name"])
     source_cols = ['Sample Type', 'Sample Type 2', 'Source General',  'Source_Specific_1', 'Source_Specific_2', 'Sample Source']
     df_source_info = df[source_cols].transpose()
+    print str(df_source_info)
     return df_source_info.to_dict()
     
 
