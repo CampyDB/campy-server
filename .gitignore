@@ -6,3 +6,6 @@ tmp/*
 log/*.log
 *.pid
 docs/_build/
+*.csv
+*.json
+*.csv#

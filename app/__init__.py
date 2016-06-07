@@ -35,7 +35,6 @@ def init_logger(path='log/app.log'):
     logger.addHandler(file_handler)
     return logger
 
-
 logger = init_logger()
 
 
