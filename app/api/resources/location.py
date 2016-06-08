@@ -1,63 +1,75 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import pandas as pd
 from flask_restful import Resource
 import json
-df = pd.read_csv(r"/home/student/Campii/geoIndex.csv", low_memory = False)
-maxRows = df["id"].count()
 
-"""
-    Uses an index csv to load in geo data stored in JSON files for the strain isolates. The geo data
-    in the JSON was pulled from the Nominatim api from OpenStreetMap. 
+df = pd.read_csv(r"/home/student/Campii/geoIndex.csv", low_memory=False)
+maxRows = df['id'].count()
 
+
+def createGeoDict(max_rows):
+    """
+    Gets a dictionary of geo data and a dictionary of isolates that map to the geodata. Uses an 
+    index csv to load in geo data stored in JSON files for the strain isolates. The geo data
+    was pulled from the Nominatim api from OpenStreetMap. 
+
+    Notes:
+        The geo dictionary and isolates have the same key value, which is just "<lat coord>, <long cord>".
     Args:
-        max_rows (obj): data to JSONify and send in response as content
-        code (int): HTTP code
-        headers (dict): Response headers
+        max_rows (int): CSV max row
 
     Returns:
-        flask.Response: Flask HTTP Response object
-"""
-def createGeoDict(max_rows):
-    uniqueDict = {}
-    dictGeo = {}
-    dictIsolates = {}
+        dictGeo: Geo data dictionary
+        dictIsolates: Isolate dictionary.
+    """
+
+    unique_dict = {}
+    dict_geo = {}
+    dict_isolates = {}
 
     for row in range(maxRows):
-
         data = None
-        with open("/home/student/Campii/geodata/"+str(df["id"][row]) + ".json") as f:    
+        with open('/home/student/Campii/geodata/' + str(df['id'][row])
+                  + '.json') as f:
             data = json.load(f)
-        isolateName = data["isolateName"]
-        data.pop("isolateName", None)
-        if "oLatitude" in data:
-            data.pop("oLatitude", None)
-        if "oLongitude" in data:
-            data.pop("oLongitude", None)
-        if str(data) not in uniqueDict.values():
-
-            data.pop("isolateName", None)
-            uniqueDict[str(data["latitude"]) + ", " + str(data["longitude"])] = str(data)
-            dictGeo[str(data["latitude"]) + ", " + str(data["longitude"])] = data
-            dictIsolates[str(data["latitude"]) + ", " + str(data["longitude"])] = [isolateName]
+        isolateName = data['isolateName']
+        data.pop('isolateName', None)
+        if 'oLatitude' in data:
+            data.pop('oLatitude', None)
+        if 'oLongitude' in data:
+            data.pop('oLongitude', None)
+        if str(data) not in unique_dict.values():
+            data.pop('isolateName', None)
+            unique_dict[str(data['latitude']) + ', '
+                       + str(data['longitude'])] = str(data)
+            dict_geo[str(data['latitude']) + ', ' + str(data['longitude'
+                    ])] = data
+            dict_isolates[str(data['latitude']) + ', '
+                         + str(data['longitude'])] = [isolateName]
         else:
+            dict_isolates[str(data['latitude']) + ', '
+                         + str(data['longitude'])].append(isolateName)
+    return (dict_geo, dict_isolates)
 
-            dictIsolates[str(data["latitude"]) + ", " + str(data["longitude"])].append(isolateName)
 
-    return dictGeo, dictIsolates
+class GeoAPI(Resource):
 
-
-class GeoDict(Resource):    
     def get(self):
-        df = pd.read_csv(r"/home/student/Campii/geoIndex.csv", low_memory = False)
-        max_rows = df["id"].count()
-        dictGeo, dictIsolates = createGeoDict(max_rows)
-        return dictGeo
+        df = pd.read_csv(r"/home/student/Campii/geoIndex.csv",
+                         low_memory=False)
+        max_rows = df['id'].count()
+        (dict_geo, dict_isolates) = createGeoDict(max_rows)
+        return dict_geo
 
-class GeoIsolatesDict(Resource):    
+
+class GeoIsolatesAPI(Resource):
+
     def get(self):
-        df = pd.read_csv(r"/home/student/Campii/geoIndex.csv", low_memory = False)
-        max_rows = df["id"].count()
-        dictGeo, dictIsolates = createGeoDict(max_rows)
-        return dictIsolates
-
+        df = pd.read_csv(r"/home/student/Campii/geoIndex.csv",
+                         low_memory=False)
+        max_rows = df['id'].count()
+        (dict_geo, dict_isolates) = createGeoDict(max_rows)
+        return dict_isolates
 
 

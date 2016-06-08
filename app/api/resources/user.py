@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import g
-from flask.ext.restful import Resource, reqparse
+from flask_restful import Resource, reqparse
 from app import session, logger
 from app.api import authorized
 from app.models import User

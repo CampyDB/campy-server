@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from scipy.spatial.distance import pdist, cdist
 import numpy as np
 from fastcluster import linkage
@@ -6,6 +8,7 @@ import pandas as pd
 from collections import defaultdict
 import re
 from flask_restful import Resource, reqparse
+
 
 def complete_linkage(dm):
     """
@@ -17,7 +20,9 @@ def complete_linkage(dm):
     Returns:
         (object): fastcluster complete linkage hierarchical clustering object
     """
+
     return linkage(dm, 'complete')
+
 
 def to_newick(tree, leaf_names):
     """Newick tree output string from SciPy hierarchical clustering tree
@@ -32,10 +37,18 @@ def to_newick(tree, leaf_names):
     Returns:
         (string): Newick output string
     """
-    newick_list = _scipy_tree_to_newick_list(tree, [], tree.dist, leaf_names)
+
+    newick_list = _scipy_tree_to_newick_list(tree, [], tree.dist,
+            leaf_names)
     return ''.join(newick_list[::-1])
 
-def _scipy_tree_to_newick_list(node, newick, parentdist, leaf_names):
+
+def _scipy_tree_to_newick_list(
+    node,
+    newick,
+    parentdist,
+    leaf_names,
+    ):
     """List of Newick tree output string from SciPy hierarchical clustering tree
 
     This is a recursive function to help build a Newick output string from a scipy.cluster.hierarchy.to_tree input with
@@ -53,19 +66,24 @@ def _scipy_tree_to_newick_list(node, newick, parentdist, leaf_names):
     Returns:
         (list of string): Returns `newick` list of Newick output strings
     """
+
     if node.is_leaf():
-        newick.append("%s:%.2f" % (leaf_names[node.id], parentdist - node.dist))
+        newick.append('%s:%.2f' % (leaf_names[node.id], parentdist
+                      - node.dist))
         return newick
     else:
         if len(newick) > 0:
-            newick.append("):%.2f" % (parentdist - node.dist))
+            newick.append('):%.2f' % (parentdist - node.dist))
         else:
-            newick.append(");")
-        newick = _scipy_tree_to_newick_list(node.get_left(), newick, node.dist, leaf_names)
+            newick.append(');')
+        newick = _scipy_tree_to_newick_list(node.get_left(), newick,
+                node.dist, leaf_names)
         newick.append(',')
-        newick = _scipy_tree_to_newick_list(node.get_right(), newick, node.dist, leaf_names)
-        newick.append("(")
+        newick = _scipy_tree_to_newick_list(node.get_right(), newick,
+                node.dist, leaf_names)
+        newick.append('(')
         return newick
+
 
 def get_newick_tree(fps):
     """
@@ -82,7 +100,8 @@ def get_newick_tree(fps):
         dict['tree']: Newick string of collapsed tree of specified `genomes`
         dict['genomes']: 2D list of genomes grouped based on 100% cgMLST profile similarity
     """
-    dm, gs_collapse = get_distance(fps)
+
+    (dm, gs_collapse) = get_distance(fps)
     Z = complete_linkage(dm)
     T = to_tree(Z, False)
     names = []
@@ -91,12 +110,6 @@ def get_newick_tree(fps):
     rtn_obj = {'tree': nwk_str, 'genomes': gs_collapse}
     return rtn_obj
 
-
-
-# I think it might be best to just extract the CGF data into it's own CSV of just the binary data
-# rownames = sample names
-# column names = marker names
-# data = 0/1
 
 def read_binary_cgf_matrix(filename):
     """Gets numpy array of pandas dataframe
@@ -107,13 +120,15 @@ def read_binary_cgf_matrix(filename):
     Returns:
         np.array(df): Numpy array of dataframe. 
     """
+
     df = pd.read_csv(filename, index_col=0)
+
     # np.array of CGF profiles, rownames, column names
+
     return np.array(df)
 
-# underscores - no camelCase ;) \/ check out the Google Python style guide :)
-# https://google.github.io/styleguide/pyguide.html
-def get_distance(fps):        
+
+def get_distance(fps):
     """Compute Hamming distance for CGF profiles
     
     Args:
@@ -122,33 +137,34 @@ def get_distance(fps):
     Returns:
         (np.array, list of list of str): 
     """
+
     pair = {}
     collapse = {}
     arr = []
+    profiles = []
 
     for row in fps:
-        name = re.sub(r'\W','_', row[0])
+        name = re.sub(r'\W', '_', row[0])
         isolate_name = str(row[0])
         cgf_profile = str(row[1])
         pair[name] = cgf_profile
-    
+
     collapse = defaultdict(list)
-    profiles = []
-    for isolate_name, cgf_profile in pair.iteritems():
+    for (isolate_name, cgf_profile) in pair.iteritems():
         if cgf_profile not in collapse:
             arr.append(map(int, cgf_profile))
             profiles.append(cgf_profile)
         collapse[cgf_profile].append(isolate_name)
-
     dm = pdist(arr, metric='hamming')
-    return dm, [collapse[x] for x in profiles]
+    return (dm, [collapse[x] for x in profiles])
 
 
-class CgfNewickTree(Resource):    
+class CgfNewickTreeAPI(Resource):
+
     def get(self):
-        fps = read_binary_cgf_matrix("/home/student/cgf/campy-server/app/api/resources/cgf.csv")
+        fps = \
+            read_binary_cgf_matrix('/home/student/cgf/campy-server/app/api/resources/cgf.csv')
         rtn_obj = get_newick_tree(fps)
-        print str(rtn_obj)
         return rtn_obj
 
-   
+
