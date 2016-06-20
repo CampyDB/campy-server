@@ -28,13 +28,13 @@ def createGeoDict(max_rows):
     dict_geo = {}
     dict_isolates = {}
 
-    for row in range(maxRows):
+    for row in range(max_rows):
         data = None
-        with open('/home/student/Campii/geodata/' + str(df['id'][row])
+        with open('/home/student/Campii/geodata2/' + str(df['id'][row])
                   + '.json') as f:
             data = json.load(f)
-        isolateName = data['isolateName']
-        data.pop('isolateName', None)
+        isolateName = data['isolate_name']
+        data.pop('isolate_name', None)
         if 'oLatitude' in data:
             data.pop('oLatitude', None)
         if 'oLongitude' in data:

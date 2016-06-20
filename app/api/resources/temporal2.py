@@ -4,7 +4,7 @@ import pandas as pd
 from flask_restful import Resource
 
 
-def isoDate(df):
+def isoDate(df, max_row):
     """
     Gets the temporal data for isolates in ISO format from a CSV.
 
@@ -20,9 +20,10 @@ def isoDate(df):
     Returns:
         isolates: Temporal data dictionary
     """
-
+    
     max_rows = df['isolate_name'].count()
-    max_rows = 1000
+    if max_row < max_rows:
+        max_rows = max_rowy
     isolates = {}
     for row in range(max_rows):
         iso_name = df['isolate_name'][row]

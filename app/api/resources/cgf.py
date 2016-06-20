@@ -142,13 +142,15 @@ def get_distance(fps):
     collapse = {}
     arr = []
     profiles = []
-
-    for row in fps:
+    i = 0
+    for row in fps[:10]:
+        i = i + 1
         name = re.sub(r'\W', '_', row[0])
         isolate_name = str(row[0])
         cgf_profile = str(row[1])
         pair[name] = cgf_profile
 
+    print str(i)
     collapse = defaultdict(list)
     for (isolate_name, cgf_profile) in pair.iteritems():
         if cgf_profile not in collapse:
