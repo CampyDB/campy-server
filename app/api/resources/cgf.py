@@ -9,6 +9,11 @@ from collections import defaultdict
 import re
 from flask_restful import Resource, reqparse
 
+import os
+base_dir = os.path.join(os.path.dirname(__file__), '../../..')
+here = lambda x: os.path.abspath(os.path.join(base_dir, x))
+
+MATRIX_DB_PATH = here('data/cgf.csv')
 
 def complete_linkage(dm):
     """
@@ -150,7 +155,6 @@ def get_distance(fps):
         cgf_profile = str(row[1])
         pair[name] = cgf_profile
 
-    print str(i)
     collapse = defaultdict(list)
     for (isolate_name, cgf_profile) in pair.iteritems():
         if cgf_profile not in collapse:
@@ -165,7 +169,7 @@ class CgfNewickTreeAPI(Resource):
 
     def get(self):
         fps = \
-            read_binary_cgf_matrix('/home/student/cgf/campy-server/app/api/resources/cgf.csv')
+            read_binary_cgf_matrix(MATRIX_DB_PATH)
         rtn_obj = get_newick_tree(fps)
         return rtn_obj
 

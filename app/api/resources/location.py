@@ -3,12 +3,15 @@
 import pandas as pd
 from flask_restful import Resource
 import json
+import os
+base_dir = os.path.join(os.path.dirname(__file__), '../../..')
+here = lambda x: os.path.abspath(os.path.join(base_dir, x))
 
-df = pd.read_csv(r"/home/student/Campii/geoIndex.csv", low_memory=False)
-maxRows = df['id'].count()
+ISOLATE_DB_PATH = here("data/geo/isolate_table.csv")
+GEO_DB_PATH = here("data/geo/geo_table.csv")
+GEO_JSON_PATH = here("data/geo/json")
 
-
-def createGeoDict(max_rows):
+def create_geo_dict(isolates_df, geo_df):
     """
     Gets a dictionary of geo data and a dictionary of isolates that map to the geodata. Uses an 
     index csv to load in geo data stored in JSON files for the strain isolates. The geo data
@@ -24,52 +27,53 @@ def createGeoDict(max_rows):
         dictIsolates: Isolate dictionary.
     """
 
-    unique_dict = {}
     dict_geo = {}
     dict_isolates = {}
 
-    for row in range(max_rows):
+    for row in geo_df.index:
         data = None
-        with open('/home/student/Campii/geodata2/' + str(df['id'][row])
+        with open(GEO_JSON_PATH + "/" + str(geo_df['misc'][row]) + '.json') as f:
+            data = json.load(f)
+        for key, value in data.iteritems():
+            dict_geo[key] = value
+    
+    for row in isolates_df.index:
+        data = None
+        isolate_name = isolates_df['name'][row]
+        with open(GEO_JSON_PATH + "/" + str((isolates_df['geo_id'][row]))
                   + '.json') as f:
             data = json.load(f)
-        isolateName = data['isolate_name']
-        data.pop('isolate_name', None)
-        if 'oLatitude' in data:
-            data.pop('oLatitude', None)
-        if 'oLongitude' in data:
-            data.pop('oLongitude', None)
-        if str(data) not in unique_dict.values():
-            data.pop('isolateName', None)
-            unique_dict[str(data['latitude']) + ', '
-                       + str(data['longitude'])] = str(data)
-            dict_geo[str(data['latitude']) + ', ' + str(data['longitude'
-                    ])] = data
-            dict_isolates[str(data['latitude']) + ', '
-                         + str(data['longitude'])] = [isolateName]
-        else:
-            dict_isolates[str(data['latitude']) + ', '
-                         + str(data['longitude'])].append(isolateName)
-    return (dict_geo, dict_isolates)
+        for key, value in data.iteritems():
+            if key not in dict_isolates:
+                dict_isolates[str(value[u'latitude']) + ', '
+                         + str(value[u'longitude'])] = [isolate_name]
+            else:
+                dict_isolates[str(value[u'latitude']) + ', '
+                         + str(value[u'longitude'])].append(isolate_name)
+
+    return dict_geo, dict_isolates
+
 
 
 class GeoAPI(Resource):
 
     def get(self):
-        df = pd.read_csv(r"/home/student/Campii/geoIndex.csv",
-                         low_memory=False)
-        max_rows = df['id'].count()
-        (dict_geo, dict_isolates) = createGeoDict(max_rows)
+        isolates_df = pd.read_csv(ISOLATE_DB_PATH, low_memory=False)
+        geo_df = pd.read_csv(GEO_DB_PATH, low_memory=False)
+        (dict_geo, dict_isolates) = create_geo_dict(isolates_df, geo_df)
+
         return dict_geo
 
 
 class GeoIsolatesAPI(Resource):
 
     def get(self):
-        df = pd.read_csv(r"/home/student/Campii/geoIndex.csv",
-                         low_memory=False)
-        max_rows = df['id'].count()
-        (dict_geo, dict_isolates) = createGeoDict(max_rows)
+        isolates_df = pd.read_csv(ISOLATE_DB_PATH, low_memory=False)
+        geo_df = pd.read_csv(GEO_DB_PATH, low_memory=False)
+        (dict_geo, dict_isolates) = create_geo_dict(isolates_df, geo_df)
+
         return dict_isolates
+
+
 
 

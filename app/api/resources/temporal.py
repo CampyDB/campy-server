@@ -2,9 +2,15 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
 from flask_restful import Resource
+import os
 
 
-def isoDate(df):
+base_dir = os.path.join(os.path.dirname(__file__), '../../..')
+here = lambda x: os.path.abspath(os.path.join(base_dir, x))
+
+TEMPORAL_DB_PATH = here("data/timedata.csv")
+
+def iso_date(df):
     """
     Gets the temporal data for isolates in ISO format from a CSV.
 
@@ -37,10 +43,8 @@ def isoDate(df):
 class IsoDatesAPI(Resource):
 
     def get(self):
-        df = \
-            pd.read_csv(r"/home/student/cgf/campy-server/app/api/resources/timedata.csv"
-                        , low_memory=False)
-        isolates = isoDate(df)
+        df = pd.read_csv(TEMPORAL_DB_PATH, low_memory=False)
+        isolates = iso_date(df)
         return isolates
 
 

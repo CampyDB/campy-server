@@ -12,7 +12,6 @@ class TestAPI(Resource):
 
     def post(self):
         args = self.reqparse.parse_args()
-        print str(args)
         return args
 
 

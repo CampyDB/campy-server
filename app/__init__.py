@@ -7,11 +7,13 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from flask import Flask, _app_ctx_stack
-from flask.ext.cache import Cache
+from flask_cache import Cache
 from flask_mail import Mail
 from .config import config
 
+
 Base = declarative_base()
+
 
 session = scoped_session(sessionmaker(),
                          scopefunc=_app_ctx_stack.__ident_func__)
@@ -37,7 +39,7 @@ def init_logger(path='log/app.log'):
 
 logger = init_logger()
 
-
+from .api import *
 def init_db(database_uri):
     from . import models
 

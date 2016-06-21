@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 
 __author__ = 'peter'
-
+import sys
+sys.path.append("/home/student/cgf/campy-server/")
 from app import Base, create_app, session
 
 import pytest
