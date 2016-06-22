@@ -1,4 +1,5 @@
 import json
+
 def test_temporal_endpoint(app):
     client = app.test_client()
     geo_data = client.get("/api/geo")
@@ -28,12 +29,3 @@ def test_temporal_endpoint(app):
             assert geo_dict[key]['osm_api_data']
             assert isinstance(geo_dict[key]['latitude'], float)
             assert isinstance(geo_dict[key]['longitude'], float)
-
-
-
-
-
-
-
-
-

@@ -1,5 +1,6 @@
 import json
 import datetime
+
 def test_temporal_endpoint(app):
     client = app.test_client()
     data = client.get("/api/temporal")
@@ -15,4 +16,4 @@ def test_temporal_endpoint(app):
         assert isinstance(data_dict[key]['date'], unicode)
         assert datetime.datetime.strptime(data_dict[key]['date'], "%Y-%m-%d")
         assert isinstance(data_dict[key]['day_bool'], int)
-        assert isinstance(data_dict[key]['month_bool'],int)
+        assert isinstance(data_dict[key]['month_bool'], int)
