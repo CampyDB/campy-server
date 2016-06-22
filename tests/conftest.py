@@ -8,6 +8,11 @@ from app import Base, create_app, session
 import pytest
 
 
+@pytest.fixture(scope="module")
+def client(app):
+    client = app.test_client()
+    return client
+
 @pytest.yield_fixture(scope='session')
 def app():
     _app = create_app('testing')

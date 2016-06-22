@@ -1,11 +1,11 @@
 import json
-def test_temporal_endpoint(app):
-    client = app.test_client()
+
+def test_cgf_endpoint(client):
     data = client.get("/api/newick")
     assert data._status_code == 200
     assert isinstance(data.data, str)
     data_dict = json.loads(data.data)
-    assert data_dict
+    assert data.data
     assert isinstance(data_dict, dict)
 
     assert 'genomes' in data_dict
@@ -16,12 +16,3 @@ def test_temporal_endpoint(app):
     for isolate_set in data_dict:
         for isolate_name in isolate_set:
            assert isinstance(isolate_name, unicode)
-
-
-
-
-
-
-
-
-

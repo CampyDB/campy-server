@@ -1,7 +1,7 @@
 import json
 import math
-def test_temporal_endpoint(app):
-    client = app.test_client()
+
+def test_source_endpoint(client):
     data = client.get("/api/source")
     assert data._status_code == 200
     assert isinstance(data.data, str)
@@ -23,4 +23,3 @@ def test_temporal_endpoint(app):
         assert data_dict[key]['Source_Specific_1']
         assert isinstance(data_dict[key]['Source_Specific_2'], unicode) or math.isnan(data_dict[key]['Source_Specific_2'])
         assert data_dict[key]['Source_Specific_2']
-

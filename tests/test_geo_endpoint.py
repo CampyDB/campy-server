@@ -1,7 +1,6 @@
 import json
 
-def test_temporal_endpoint(app):
-    client = app.test_client()
+def test_temporal_endpoint(client):
     geo_data = client.get("/api/geo")
     assert geo_data._status_code == 200
     assert isinstance(geo_data.data, str)
@@ -13,7 +12,7 @@ def test_temporal_endpoint(app):
     assert isolate_data.status_code == 200
     assert isinstance(isolate_data.data, str)
     assert isolate_data.data
-    isolate_dict = json.loads(isolate_data)
+    isolate_dict = json.loads(isolate_data.data)
     assert isinstance(geo_dict, dict)
 
     for key in isolate_dict:

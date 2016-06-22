@@ -1,8 +1,7 @@
 import json
 import datetime
 
-def test_temporal_endpoint(app):
-    client = app.test_client()
+def test_temporal_endpoint(client):
     data = client.get("/api/temporal")
     assert data._status_code == 200
     assert isinstance(data.data, str)
