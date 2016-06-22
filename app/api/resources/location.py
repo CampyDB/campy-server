@@ -30,17 +30,17 @@ def create_geo_dict(isolates_df, geo_df):
     dict_geo = {}
     dict_isolates = {}
 
-    for row in geo_df.index:
+    for idx, row in geo_df.iterrows():
         data = None
-        with open(GEO_JSON_PATH + "/" + str(geo_df['misc'][row]) + '.json') as f:
+        with open(os.path.join(GEO_JSON_PATH, str(row['misc']) + '.json')) as f:
             data = json.load(f)
         for key, value in data.iteritems():
             dict_geo[key] = value
     
-    for row in isolates_df.index:
+    for idx, row in isolates_df.iterrows():
         data = None
-        isolate_name = isolates_df['name'][row]
-        with open(GEO_JSON_PATH + "/" + str((isolates_df['geo_id'][row]))
+        isolate_name = row['name']
+        with open(GEO_JSON_PATH + "/" + str(row['geo_id'])
                   + '.json') as f:
             data = json.load(f)
         for key, value in data.iteritems():
