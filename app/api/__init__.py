@@ -6,7 +6,7 @@ from functools import wraps
 
 from resources.cgf import CgfNewickTreeAPI
 from resources.location import GeoAPI, GeoIsolatesAPI
-from resources.temporal import IsoDatesAPI
+from resources.temporal import IsoDatesAPI, IsoDatesAllAPI
 from resources.source import SourceAPI
 from resources.test import TestAPI
 
@@ -141,7 +141,8 @@ api = Api(api_bp, catch_all_404s=False)
 api.add_resource(CgfNewickTreeAPI, '/newick')
 api.add_resource(GeoAPI, '/geo')
 api.add_resource(GeoIsolatesAPI, '/geoisolates')
-api.add_resource(IsoDatesAPI, '/temporal')
+api.add_resource(IsoDatesAPI, '/temporal/start/<string:start_date>/end/<string:end_date>')
+api.add_resource(IsoDatesAllAPI, '/temporal/all')
 api.add_resource(SourceAPI, '/source')
 api.add_resource(TestAPI, '/test')
 
