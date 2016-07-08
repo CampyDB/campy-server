@@ -1,8 +1,10 @@
 from flask import Flask
 from app.api import api_bp
+from flask_cors import CORS, cross_origin
 import app as ad
 
 app = ad.create_app()
+CORS(app)
 
 
 @app.route('/')

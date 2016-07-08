@@ -6,9 +6,12 @@ from functools import wraps
 
 from resources.cgf import CgfNewickTreeAPI
 from resources.location import GeoAPI, GeoIsolatesAPI
-from resources.temporal import IsoDatesAPI, IsoDatesAllAPI
+from resources.temporal import IsoDatesAPI, IsoDatesAllAPI, IsoDatesCountAPI, DCIsoCount
 from resources.source import SourceAPI
 from resources.test import TestAPI
+from io import BytesIO
+from gzip import GzipFile
+from redis import Redis
 
 from flask import Flask, Blueprint
 from flask import make_response, request, Blueprint, current_app, \
@@ -141,10 +144,44 @@ api = Api(api_bp, catch_all_404s=False)
 api.add_resource(CgfNewickTreeAPI, '/newick')
 api.add_resource(GeoAPI, '/geo')
 api.add_resource(GeoIsolatesAPI, '/geoisolates')
-api.add_resource(IsoDatesAPI, '/temporal/start/<string:start_date>/end/<string:end_date>')
+api.add_resource(IsoDatesAPI, '/temporal/filter')
 api.add_resource(IsoDatesAllAPI, '/temporal/all')
+api.add_resource(IsoDatesCountAPI, '/temporal/count')
 api.add_resource(SourceAPI, '/source')
 api.add_resource(TestAPI, '/test')
+api.add_resource(DCIsoCount, '/data')
+
+def compress_key(data):
+    """
+    MD5 hexdigest a string.
+
+    Args:
+        data (str): string to MD5 hexdigest
+
+    Returns:
+        str: hexdigest of ``data``
+    """
+    import hashlib
+    md5 = hashlib.md5()
+    md5.update(data.encode('utf-8'))
+    return md5.hexdigest()
+
+def compress(content):
+    """
+    GZIP compress a string.
+
+    Args:
+        content (str): String to GZIP compress
+
+    Returns:
+        str: Gzipped string
+    """
+    gzip_buffer = BytesIO()
+    with GzipFile(mode='wb',
+                  compresslevel=6,
+                  fileobj=gzip_buffer) as gzip_file:
+        gzip_file.write(content)
+    return gzip_buffer.getvalue()
 
 
 @api.representation('application/json')
@@ -169,6 +206,14 @@ def output_json(data, code, headers=None):
         content = str(callback) + '(' + data + ')'
     else:
         content = data
+    key = 'cgfdb-' + compress_key(content)
+    redis = Redis()
+    gzip_content = redis.get(key) or compress(content)
+    redis.set(key, gzip_content)
+
     resp = make_response(content, code)
     resp.headers.extend(headers or {})
+
+    resp.headers['Content-Endcoding'] = 'gzip'
+    resp.headers['Content-Length'] = resp.content_length
     return resp
